@@ -2,6 +2,7 @@
 using System.Data;
 using System.Windows;
 using FileExplorer.MVVM.View;
+using Application = System.Windows.Application;
 
 namespace FileExplorer
 {

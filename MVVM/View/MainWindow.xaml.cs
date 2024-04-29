@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using FileExplorer.MVVM.ViewModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +20,10 @@ namespace FileExplorer.MVVM.View
         public MainWindow()
         {
             InitializeComponent();
+            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel();
+            this.DataContext = mainWindowViewModel;
         }
+
+     
     }
 }

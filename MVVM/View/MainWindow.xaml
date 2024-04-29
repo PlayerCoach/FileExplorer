@@ -20,9 +20,9 @@
         <ToolBar DockPanel.Dock="Top" Style="{StaticResource ModernToolbar}">
             <Menu ToolBar.OverflowMode="Never" Background="Transparent">
                 <MenuItem Header="File" Width="33" TextBlock.TextAlignment="Center">
-                    <MenuItem Header="Open" />
+                    <MenuItem Header="Open" Command="{Binding OpenFileCommand}" />
                     <Separator />
-                    <MenuItem Header="Exit" />
+                    <MenuItem Header="Exit" Command="{Binding CloseAppCommand }" />
                 </MenuItem>
             </Menu>
         </ToolBar>
@@ -33,7 +33,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TreeView Grid.Column="0"/>
+            <TreeView Grid.Column="0" ItemsSource="{Binding RootDirectory.Items}"/>
             <TextBlock Grid.Column="1" Text="File will be shown here"/>
 
             <!-- Add your grid content here -->
