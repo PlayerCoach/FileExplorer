@@ -33,7 +33,9 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TreeView Grid.Column="0" ItemsSource="{Binding RootDirectory.Items}"/>
+            <TreeView Grid.Column="0" Name="FileTree"/>
+
+
             <TextBlock Grid.Column="1" Text="File will be shown here"/>
 
             <!-- Add your grid content here -->

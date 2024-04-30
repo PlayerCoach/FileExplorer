@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FileExplorer.MVVM.Model
 {
@@ -28,9 +29,9 @@ namespace FileExplorer.MVVM.Model
             {
                 item.Items.Add(createTree(directory));
             }
-
             return item;
         }
+
 
         public void printTreeViewToDebug(TreeViewItem item)
         {
@@ -38,6 +39,16 @@ namespace FileExplorer.MVVM.Model
             foreach (TreeViewItem subItem in item.Items)
             {
                 printTreeViewToDebug(subItem);
+            }
+        }
+        private void treeItem_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("CHUJ CI NA PIZDE"); // Print the Tag value
+            if (sender is TreeViewItem item)
+            {
+                // Assuming the Tag property is set and is of type string
+                string tagValue = item.Tag as string;
+
             }
         }
     }
