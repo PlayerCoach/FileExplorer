@@ -21,11 +21,11 @@ namespace FileExplorer.MVVM.ViewModel
     {
         public ICommand OpenFileCommand { get; set; }
         public ICommand CloseAppCommand { get; set; }
-        public ICommand ReadTagCommand { get; set; }  // Add this line
+        public ICommand ReadTagCommand { get; set; }  
+        public ICommand DeleteFileCommand { get; set; }
         private TreeViewItem? _selectedItem;
 
         private TreeViewItem? _rootDirectory;
-        private string? header = null;
         private TreeView FileTree;
         private TextBlock FilePreviewTextBlock;
         private FileOperator fileOperator = new FileOperator();
@@ -52,6 +52,7 @@ namespace FileExplorer.MVVM.ViewModel
             OpenFileCommand = new RelayCommand(OpenFile, CanOpenFile);
             CloseAppCommand = new RelayCommand(CloseApp, CanCloseApp);
             ReadTagCommand = new RelayCommand(ReadTag, _ => true);
+            DeleteFileCommand = new RelayCommand(DeleteFile, CanDeleteFile);
             FileTree = thisFileTree;
             FilePreviewTextBlock = thisFilepreviewTextBlock;
             FileTree.PreviewMouseRightButtonDown += TreeView_PreviewMouseRightButtonDown;
@@ -69,7 +70,7 @@ namespace FileExplorer.MVVM.ViewModel
                     _selectedItem.IsSelected = false;
                     _selectedItem = null;
                 }
-                else
+                else if (item != null)
                 {
                     _selectedItem = item;
                     FilePreviewTextBlock.Text = fileOperator.ReadFile(item.Tag as string);
@@ -85,7 +86,7 @@ namespace FileExplorer.MVVM.ViewModel
                 TreeViewItem item = GetNearestContainer(originalSource);
                 if (item != null)
                 {
-                    item.IsSelected = true; // Select the item
+                    item.IsSelected = true; 
                     ShowContextMenu(item);
                     e.Handled = true;
                     _selectedItem = item;
@@ -113,8 +114,18 @@ namespace FileExplorer.MVVM.ViewModel
                 Header = "Show Path",
                 Command = ReadTagCommand,
                 CommandParameter = item.Tag
+
             };
+
+            MenuItem deleteFileItem = new MenuItem
+            {
+                Header = "Delete File",
+                Command = DeleteFileCommand,
+                CommandParameter = item.Tag
+            };
+
             contextMenu.Items.Add(showPathItem);
+            contextMenu.Items.Add(deleteFileItem);
 
             contextMenu.IsOpen = true;
         }
@@ -134,10 +145,8 @@ namespace FileExplorer.MVVM.ViewModel
             {
                 return;
             }
-
-            RootDirectory = mainWindowModel.createTree(dlg.SelectedPath);
-            header = System.IO.Path.GetFileName(dlg.SelectedPath);
-            RootDirectory.MouseLeftButtonDown += treeItem_MouseLeftButtonUp;
+            FileTree.Items.Clear();
+            RootDirectory = mainWindowModel.GetFolderTree(dlg.SelectedPath);
             FileTree.Items.Add(RootDirectory);
         }
 
@@ -153,18 +162,19 @@ namespace FileExplorer.MVVM.ViewModel
 
         private void ReadTag(object tag)
         {
-            Debug.WriteLine($"Tag: {tag}");
+            System.Diagnostics.Debug.WriteLine($"Tag: {tag}");
         }
 
-        private void treeItem_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private bool CanDeleteFile(object tag)
         {
-            System.Diagnostics.Debug.WriteLine("CHUJ CI NA PIZDE"); // Print the Tag value
-            if (sender is TreeViewItem item)
-            {
-                // Assuming the Tag property is set and is of type string
-                string tagValue = item.Tag as string;
+            return true;
+        }
 
-            }
+        private void DeleteFile(object tag)
+        {
+            mainWindowModel.DeleteItem(tag as string);
+            FileTree.Items.Clear();
+            FileTree.Items.Add(mainWindowModel.GetTreeItem());
         }
     }
 }
