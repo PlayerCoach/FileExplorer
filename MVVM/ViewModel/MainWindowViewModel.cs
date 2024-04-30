@@ -10,6 +10,10 @@ using FileExplorer.MVVM.Model;
 using System.Windows;
 using System.Diagnostics;
 using System.Windows.Media;
+using FileExplorer.MVVM.ViewModel.FileOperations;
+using TreeView = System.Windows.Controls.TreeView;
+using TextBlock = System.Windows.Controls.TextBlock;
+
 
 namespace FileExplorer.MVVM.ViewModel
 {
@@ -22,7 +26,9 @@ namespace FileExplorer.MVVM.ViewModel
 
         private TreeViewItem? _rootDirectory;
         private string? header = null;
-        private System.Windows.Controls.TreeView FileTree;
+        private TreeView FileTree;
+        private TextBlock FilePreviewTextBlock;
+        private FileOperator fileOperator = new FileOperator();
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -41,12 +47,13 @@ namespace FileExplorer.MVVM.ViewModel
 
         private MainWindowModel mainWindowModel = new MainWindowModel();
 
-        public MainWindowViewModel(System.Windows.Controls.TreeView thisFileTree)
+        public MainWindowViewModel(TreeView thisFileTree, TextBlock thisFilepreviewTextBlock)
         {
             OpenFileCommand = new RelayCommand(OpenFile, CanOpenFile);
             CloseAppCommand = new RelayCommand(CloseApp, CanCloseApp);
             ReadTagCommand = new RelayCommand(ReadTag, _ => true);
             FileTree = thisFileTree;
+            FilePreviewTextBlock = thisFilepreviewTextBlock;
             FileTree.PreviewMouseRightButtonDown += TreeView_PreviewMouseRightButtonDown;
             FileTree.PreviewMouseLeftButtonDown += TreeView_PreviewMouseLeftButtonDown; // Add this line
         }
@@ -65,6 +72,8 @@ namespace FileExplorer.MVVM.ViewModel
                 else
                 {
                     _selectedItem = item;
+                    FilePreviewTextBlock.Text = fileOperator.ReadFile(item.Tag as string);
+
                 }
             }
         }

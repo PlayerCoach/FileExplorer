@@ -21,7 +21,7 @@ namespace FileExplorer.MVVM.View
         public MainWindow()
         {
             InitializeComponent();
-            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(FileTree);
+            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(FileTree, FilePreviewTextBlock);
             this.DataContext = mainWindowViewModel;
         }
 

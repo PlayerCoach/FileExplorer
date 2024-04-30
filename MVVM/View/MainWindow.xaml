@@ -50,7 +50,9 @@
             </TreeView>
 
 
-            <TextBlock Grid.Column="1" Text="File will be shown here"/>
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <TextBlock Name="FilePreviewTextBlock"/>
+            </ScrollViewer>
 
             <!-- Add your grid content here -->
         </Grid>
