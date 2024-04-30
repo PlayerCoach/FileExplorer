@@ -25,17 +25,5 @@ namespace FileExplorer.MVVM.View
             this.DataContext = mainWindowViewModel;
         }
 
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (e.NewValue is TreeViewItem item)
-            {
-                // Assuming the Tag property is set and is of type string
-                string tagValue = item.Tag as string;
-                System.Diagnostics.Debug.WriteLine(tagValue); // Print the Tag value
-            }
-        }
-
-
-
     }
 }

@@ -33,7 +33,21 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TreeView Grid.Column="0" Name="FileTree"/>
+            <TreeView Name="FileTree">
+                <TreeView.Resources>
+                    <Style TargetType="TreeViewItem">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                
+                                <!-- Add this line -->
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TreeView.Resources>
+                <!-- TreeView items here -->
+            </TreeView>
 
 
             <TextBlock Grid.Column="1" Text="File will be shown here"/>

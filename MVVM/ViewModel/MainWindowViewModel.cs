@@ -9,6 +9,7 @@ using FileExplorer.MVVM.View;
 using FileExplorer.MVVM.Model;
 using System.Windows;
 using System.Diagnostics;
+using System.Windows.Media;
 
 namespace FileExplorer.MVVM.ViewModel
 {
@@ -17,6 +18,7 @@ namespace FileExplorer.MVVM.ViewModel
         public ICommand OpenFileCommand { get; set; }
         public ICommand CloseAppCommand { get; set; }
         public ICommand ReadTagCommand { get; set; }  // Add this line
+        private TreeViewItem? _selectedItem;
 
         private TreeViewItem? _rootDirectory;
         private string? header = null;
@@ -43,20 +45,71 @@ namespace FileExplorer.MVVM.ViewModel
         {
             OpenFileCommand = new RelayCommand(OpenFile, CanOpenFile);
             CloseAppCommand = new RelayCommand(CloseApp, CanCloseApp);
-            ReadTagCommand = new RelayCommand(ReadTag, _ => true);  // Add this line
+            ReadTagCommand = new RelayCommand(ReadTag, _ => true);
             FileTree = thisFileTree;
-            FileTree.SelectedItemChanged += TreeView_SelectedItemChanged; // Add this line
+            FileTree.PreviewMouseRightButtonDown += TreeView_PreviewMouseRightButtonDown;
+            FileTree.PreviewMouseLeftButtonDown += TreeView_PreviewMouseLeftButtonDown; // Add this line
         }
 
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void TreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.NewValue is TreeViewItem item)
+            if (e.OriginalSource is FrameworkElement originalSource)
             {
-                // Assuming the Tag property is set and is of type string
-                string tagValue = item.Tag as string;
-                System.Diagnostics.Debug.WriteLine(tagValue); // Print the Tag value
+                TreeViewItem item = GetNearestContainer(originalSource);
+                if (item == null && _selectedItem != null)
+                {
+                    // If the clicked element is not a TreeViewItem, clear the selection
+                    _selectedItem.IsSelected = false;
+                    _selectedItem = null;
+                }
+                else
+                {
+                    _selectedItem = item;
+                }
             }
         }
+
+        private void TreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is FrameworkElement originalSource)
+            {
+                TreeViewItem item = GetNearestContainer(originalSource);
+                if (item != null)
+                {
+                    item.IsSelected = true; // Select the item
+                    ShowContextMenu(item);
+                    e.Handled = true;
+                    _selectedItem = item;
+                }
+            }
+        }
+
+
+        private TreeViewItem GetNearestContainer(FrameworkElement element)
+        {
+            // Walk up the tree and stop when reaching a TreeViewItem
+            while (element != null && !(element is TreeViewItem))
+            {
+                element = VisualTreeHelper.GetParent(element) as FrameworkElement;
+            }
+            return element as TreeViewItem;
+        }
+
+        private void ShowContextMenu(TreeViewItem item)
+        {
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem showPathItem = new MenuItem
+            {
+                Header = "Show Path",
+                Command = ReadTagCommand,
+                CommandParameter = item.Tag
+            };
+            contextMenu.Items.Add(showPathItem);
+
+            contextMenu.IsOpen = true;
+        }
+
 
 
         private bool CanOpenFile(object obj)
