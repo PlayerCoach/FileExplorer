@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileExplorer.MVVM.View"
         mc:Ignorable="d"
-        Height="450" Width="800">
+        Height="450" Width="800"
+        Title="File Explorer"
+        ResizeMode="NoResize">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -31,9 +33,10 @@
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TreeView Name="FileTree">
+            <TreeView Name="FileTree" BorderBrush="Transparent">
                 <TreeView.Resources>
                     <Style TargetType="TreeViewItem">
                         <Style.Triggers>
@@ -49,8 +52,8 @@
                 <!-- TreeView items here -->
             </TreeView>
 
-
-            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <Border Grid.Column="1" Background="Black"/>
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <TextBlock Name="FilePreviewTextBlock"/>
             </ScrollViewer>
 

@@ -14,7 +14,6 @@ using FileExplorer.MVVM.ViewModel.FileOperations;
 using TreeView = System.Windows.Controls.TreeView;
 using TextBlock = System.Windows.Controls.TextBlock;
 
-
 namespace FileExplorer.MVVM.ViewModel
 {
     public class MainWindowViewModel : INotifyPropertyChanged
@@ -23,6 +22,8 @@ namespace FileExplorer.MVVM.ViewModel
         public ICommand CloseAppCommand { get; set; }
         public ICommand ReadTagCommand { get; set; }  
         public ICommand DeleteFileCommand { get; set; }
+        public ICommand CreateFileCommand { get; set; }
+
         private TreeViewItem? _selectedItem;
 
         private TreeViewItem? _rootDirectory;
@@ -51,13 +52,34 @@ namespace FileExplorer.MVVM.ViewModel
         {
             OpenFileCommand = new RelayCommand(OpenFile, CanOpenFile);
             CloseAppCommand = new RelayCommand(CloseApp, CanCloseApp);
-            ReadTagCommand = new RelayCommand(ReadTag, _ => true);
+            ReadTagCommand = new RelayCommand(ReadTag,CanReadTag);
             DeleteFileCommand = new RelayCommand(DeleteFile, CanDeleteFile);
+            CreateFileCommand = new RelayCommand(CreateFile, CanCreateFile);
             FileTree = thisFileTree;
             FilePreviewTextBlock = thisFilepreviewTextBlock;
             FileTree.PreviewMouseRightButtonDown += TreeView_PreviewMouseRightButtonDown;
             FileTree.PreviewMouseLeftButtonDown += TreeView_PreviewMouseLeftButtonDown; // Add this line
         }
+
+
+
+        private bool CanCreateFile(object obj)
+        {
+            // Check if the selected item is a directory
+            if (_selectedItem != null && Directory.Exists(_selectedItem.Tag as string))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private void CreateFile(object obj)
+        {
+            // Open the CreateFileForm window
+            CreateFileForm createFileForm = new CreateFileForm(_selectedItem.Tag as string);
+            createFileForm.ShowDialog();
+        }
+
 
         private void TreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -124,8 +146,16 @@ namespace FileExplorer.MVVM.ViewModel
                 CommandParameter = item.Tag
             };
 
+            MenuItem createFileItem = new MenuItem
+            {
+                Header = "Create File",
+                Command = CreateFileCommand,
+                CommandParameter = item.Tag
+            };
+
             contextMenu.Items.Add(showPathItem);
             contextMenu.Items.Add(deleteFileItem);
+            contextMenu.Items.Add(createFileItem);
 
             contextMenu.IsOpen = true;
         }
@@ -158,6 +188,11 @@ namespace FileExplorer.MVVM.ViewModel
         private void CloseApp(object obj)
         {
             System.Windows.Application.Current.Shutdown();
+        }
+        private bool CanReadTag(object obj)
+        {
+            return true;
+            
         }
 
         private void ReadTag(object tag)

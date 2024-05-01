@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design.Serialization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,8 @@ namespace FileExplorer.MVVM.Model
     class MainWindowModel
     {
         private ObservableCollection<TreeViewItem> TreeItems  = new ObservableCollection<TreeViewItem>();
-        private string? mainFolderPath; // usefull for restroing the tree after deleting a file or folder
+        private string? mainFolderPath; // useful for restroing the tree after deleting a file or folder
+        private List<string> expandedDirectories = new List<string>();
 
         public TreeViewItem GetFolderTree(string path)
         {
@@ -58,17 +60,23 @@ namespace FileExplorer.MVVM.Model
             }
             if (File.Exists(path))
             {
-                
+                SaveExpandedDirectories(TreeItems[0]);
                 DeleteFile(path);
                 TreeItems.Clear();
-                TreeItems.Add(createTree(mainFolderPath));
+                var RootContext = createTree(mainFolderPath);
+                ExpandDirectories(RootContext);
+                TreeItems.Add(RootContext);
+                expandedDirectories.Clear();
             }
             else if (Directory.Exists(path))
             {
-
+                SaveExpandedDirectories(TreeItems[0]);
                 DeleteFolder(path);
                 TreeItems.Clear();
-                TreeItems.Add(createTree(mainFolderPath));
+                var RootContext = createTree(mainFolderPath);
+                ExpandDirectories(RootContext);
+                TreeItems.Add(RootContext);
+                expandedDirectories.Clear();
             }
             else
             {
@@ -78,7 +86,7 @@ namespace FileExplorer.MVVM.Model
 
         static void DeleteFile(string filePath)
         {
-            //if file has read only attribute, remove it
+
             if ((File.GetAttributes(filePath) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
             {
                 File.SetAttributes(filePath, File.GetAttributes(filePath) & ~FileAttributes.ReadOnly);
@@ -111,6 +119,32 @@ namespace FileExplorer.MVVM.Model
         public TreeViewItem GetTreeItem()
         {
             return TreeItems[0];
+        }
+
+        private void SaveExpandedDirectories(TreeViewItem root)
+        {
+            if (root.IsExpanded)
+            {
+                expandedDirectories.Add(root.Tag as string);
+            }
+
+            foreach (TreeViewItem item in root.Items)
+            {
+                SaveExpandedDirectories(item);
+            }
+        }
+
+        private void ExpandDirectories(TreeViewItem root)
+        {
+            if (expandedDirectories.Contains(root.Tag as string))
+            {
+                root.IsExpanded = true;
+            }
+
+            foreach (TreeViewItem item in root.Items)
+            {
+                ExpandDirectories(item);
+            }
         }
 
     }
