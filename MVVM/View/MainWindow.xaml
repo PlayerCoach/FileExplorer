@@ -14,11 +14,11 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Themes/ModernToolbar.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         </ResourceDictionary>
     </Window.Resources>
 
     <DockPanel>
-        <!-- Define the ToolBar -->
         <ToolBar DockPanel.Dock="Top" Style="{StaticResource ModernToolbar}">
             <Menu ToolBar.OverflowMode="Never" Background="Transparent">
                 <MenuItem Header="File" Width="33" TextBlock.TextAlignment="Center">
@@ -29,8 +29,14 @@
             </Menu>
         </ToolBar>
 
-        <!-- Your main content (Grid) goes here -->
-        <Grid DockPanel.Dock="Bottom">
+        <StatusBar DockPanel.Dock="Bottom" Height="20" Background="AliceBlue" Visibility="{Binding StatusBarText, Converter={StaticResource StringToVisibilityConverter}}">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusBarText}" />
+            </StatusBarItem>
+        </StatusBar>
+
+
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="2"/>
@@ -43,21 +49,21 @@
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Background" Value="Transparent"/>
                                 <Setter Property="BorderBrush" Value="Transparent"/>
-                                
-                                <!-- Add this line -->
                             </Trigger>
                         </Style.Triggers>
                     </Style>
                 </TreeView.Resources>
-                <!-- TreeView items here -->
             </TreeView>
 
             <Border Grid.Column="1" Background="Black"/>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <TextBlock Name="FilePreviewTextBlock"/>
             </ScrollViewer>
-
-            <!-- Add your grid content here -->
         </Grid>
+        
+
     </DockPanel>
+    
+
+
 </Window>

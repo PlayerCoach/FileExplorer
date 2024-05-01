@@ -14,16 +14,15 @@ namespace FileExplorer.MVVM.Model
 {
     class MainWindowModel
     {
-        private ObservableCollection<TreeViewItem> TreeItems  = new ObservableCollection<TreeViewItem>();
+        private TreeViewItem? RootItem;
         private string? mainFolderPath; // useful for restroing the tree after deleting a file or folder
         private List<string> expandedDirectories = new List<string>();
 
         public TreeViewItem GetFolderTree(string path)
         {
-            TreeItems.Clear();
-            TreeItems.Add(createTree(path));
+            RootItem = createTree(path);
             mainFolderPath = path;
-            return TreeItems[0];
+            return RootItem;
         }
         private TreeViewItem createTree(string path)
         {
@@ -60,22 +59,20 @@ namespace FileExplorer.MVVM.Model
             }
             if (File.Exists(path))
             {
-                SaveExpandedDirectories(TreeItems[0]);
+                SaveExpandedDirectories(RootItem);
                 DeleteFile(path);
-                TreeItems.Clear();
                 var RootContext = createTree(mainFolderPath);
                 ExpandDirectories(RootContext);
-                TreeItems.Add(RootContext);
+                RootItem = RootContext;
                 expandedDirectories.Clear();
             }
             else if (Directory.Exists(path))
             {
-                SaveExpandedDirectories(TreeItems[0]);
+                SaveExpandedDirectories(RootItem);
                 DeleteFolder(path);
-                TreeItems.Clear();
                 var RootContext = createTree(mainFolderPath);
                 ExpandDirectories(RootContext);
-                TreeItems.Add(RootContext);
+                RootItem = RootContext;
                 expandedDirectories.Clear();
             }
             else
@@ -116,9 +113,9 @@ namespace FileExplorer.MVVM.Model
             }
         }
 
-        public TreeViewItem GetTreeItem()
+        public TreeViewItem GetRootItem()
         {
-            return TreeItems[0];
+            return RootItem;
         }
 
         private void SaveExpandedDirectories(TreeViewItem root)
@@ -145,6 +142,15 @@ namespace FileExplorer.MVVM.Model
             {
                 ExpandDirectories(item);
             }
+        }
+
+        public TreeViewItem ResetTree()
+        {
+            SaveExpandedDirectories(RootItem);
+            RootItem = createTree(mainFolderPath);
+            ExpandDirectories(RootItem);
+            expandedDirectories.Clear();
+            return RootItem;
         }
 
     }

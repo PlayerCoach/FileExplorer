@@ -24,36 +24,44 @@ namespace FileExplorer.MVVM.ViewModel
         public CreateFileFormViewModel(string path)
         {
             this.path = path;
-            CreateCommand = new RelayCommand(CreateFile,_ => true);
+            CreateCommand = new RelayCommand(CreateFile, _ => true);
             CancelCommand = new RelayCommand(Cancel, _ => true);
         }
 
         private void CreateFile(object parameter)
         {
-            if(CheckIfValidFileName())
+            if(string.IsNullOrEmpty(FileName))
             {
-                string fullPath = Path.Combine(path, FileName);
-                if (IsFile)
+                System.Windows.MessageBox.Show("Please enter a file name.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            string fullPath = Path.Combine(path, FileName);
+            if (IsFile)
+            {
+                if (!CheckIfValidFileName())
                 {
-                    File.Create(fullPath);
+                    System.Windows.MessageBox.Show("Invalid file name. \n Please enter a valid file name.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
-                else
-                {
-                    Directory.CreateDirectory(fullPath);
-                }
-
-                FileAttributes attributes = File.GetAttributes(fullPath);
-                if (IsReadOnly) attributes |= FileAttributes.ReadOnly;
-                if (IsArchive) attributes |= FileAttributes.Archive;
-                if (IsHidden) attributes |= FileAttributes.Hidden;
-                if (IsSystem) attributes |= FileAttributes.System;
-                File.SetAttributes(fullPath, attributes);
-                Cancel(parameter);
+                File.Create(fullPath);
             }
             else
             {
-                System.Windows.MessageBox.Show("Invalid file name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (!CHeckIfValidDirectoryName())
+                {
+                    System.Windows.MessageBox.Show("Invalid directory name. \n Please enter a valid directory name.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                Directory.CreateDirectory(fullPath);
             }
+
+            FileAttributes attributes = File.GetAttributes(fullPath);
+            if (IsReadOnly) attributes |= FileAttributes.ReadOnly;
+            if (IsArchive) attributes |= FileAttributes.Archive;
+            if (IsHidden) attributes |= FileAttributes.Hidden;
+            if (IsSystem) attributes |= FileAttributes.System;
+            File.SetAttributes(fullPath, attributes);
+            Cancel(parameter);
         }
 
         private void Cancel(object parameter)
@@ -74,11 +82,14 @@ namespace FileExplorer.MVVM.ViewModel
 
         private bool CheckIfValidFileName()
         {
-
-        string pattern = @"^[a-zA-Z0-9_~-]{1,8}\.(txt|php|html)$";
-        return Regex.IsMatch(FileName, pattern);
-
+            string pattern = @"^[a-zA-Z0-9_~-]{1,8}\.(txt|php|html)$";
+            return Regex.IsMatch(FileName, pattern);
         }
 
-}
+        private bool CHeckIfValidDirectoryName()
+        {
+            string pattern = @"^[a-zA-Z0-9_~-]{1,8}$";
+            return Regex.IsMatch(FileName, pattern);
+        }
+    }
 }
